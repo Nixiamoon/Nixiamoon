@@ -510,12 +510,14 @@ return (
     {menu==='payroll-engine'&&<PayrollEngineV9/>}{menu==='payroll-production-v22'&&<PayrollProductionV22/>}{menu==='payroll-indonesia-v23'&&<PayrollIndonesiaV23/>}
     {['performance','kpi'].includes(menu)&&<TalentModule initial={menu} employees={employees}/>} {menu==='recruitment-v25'&&<RecruitmentATSv25/>} {menu.startsWith('enterprise-v')&&menu!=='enterprise-v20'&&<EnterpriseRoadmapV26V35 version={menu.replace('enterprise-','') as any}/>} {['recruitment','candidates'].includes(menu)&&<RecruitmentEnterprise/>}
     {menu==='reports'&&<Reports employees={employees} attendance={attendance} onExport={exportCsv}/>}
-    {menu==='settings'&&<Settings/>}{menu==='roles'&&<RoleEditorEnterprise userRole={userRole}/>} {menu==='audit'&&<Audit/>}{menu==='approvals'&&<ApprovalCenter/>}{menu==='notifications'&&<Notifications/>} {menu==='system-health'&&<SystemHealth/>}{menu==='enterprise-v20'&&<EnterpriseV20 employees={employees}/>}{menu==='security-v21'&&<SecurityCenterV21/>} 
-    {editing&&<EmployeeEditor employee={editing} onClose={()=>setEditing(null)} onSave={saveEdit}/>}
-    {toast&&<button className="toast" onClick={()=>setToast('')}>{toast} ×</button>}
-   </section></main>
- </div>
-}
+    {menu==='settings'&&<Settings/>}{menu==='roles'&&<RoleEditorEnterprise userRole={userRole}/>} {menu==='audit'&&<Audit/>}{menu==='approvals'&&<ApprovalCenter/>}{menu==='notifications'&&<Notifications/>} {menu==='system-health'&&<SystemHealth/>}{menu==='enterprise-v20'&&<EnterpriseV20 employees={employees}/>}{menu==='security-v21'&&<SecurityCenterV21/>}  
+    {editing&&<EmployeeEditor employee={editing} onClose={()=>setEditing(null)} onSave={saveEdit}/>}
+    {toast&&<button className="toast" onClick={()=>setToast('')}>{toast} ×</button>}
+      </section>
+    </main>
+  </div>
+);
+};
 
 function Login(p:{email:string;pin:string;setEmail:(v:string)=>void;setPin:(v:string)=>void;onSubmit:(e:FormEvent)=>void;error:string;loading:boolean}){
  return <div className="login-wrap"><div className="login-card"><div className="brand center"><div className="brand-mark"><img src={moonLogo} alt="MoonXprojecT" /></div><div><b>MoonXprojecT</b><small>People Platform</small></div></div><h1>Selamat datang kembali</h1><p>Masuk ke dashboard HR & payroll.</p><form onSubmit={p.onSubmit}><label>Email<input value={p.email} onChange={e=>p.setEmail(e.target.value)} required/></label><label>PIN / Password<input type="password" value={p.pin} onChange={e=>p.setPin(e.target.value)} required/></label>{p.error&&<div className="form-error">{p.error}</div>}<button className="primary full" disabled={p.loading}>{p.loading?'Memeriksa…':'Masuk ke Dashboard'}</button></form><small className="security-note">Gunakan email dan password Supabase Auth yang diberikan HR.</small></div></div>
