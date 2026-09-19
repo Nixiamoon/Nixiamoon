@@ -168,7 +168,7 @@ export default function DashboardAdmin() {
         ['roles', 'Role & Permission', 'users'],
         ['audit', 'Audit Log', 'request']
       ]
-    }
+    };
   ];
  const [logged,setLogged]=useState(false),[email,setEmail]=useState(''),[pin,setPin]=useState('');
  const [menu,setMenu]=useState<MenuKey>('overview'),[sidebar,setSidebar]=useState(true);
