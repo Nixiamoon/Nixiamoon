@@ -155,96 +155,95 @@ export default function DashboardAdmin() {
   const [sessionChecking, setSessionChecking] = useState(true);
 
   // 2. Deklarasi menuGroups
-  const menuGroups = useMemo<{ title: string; items: [MenuKey, string, string][] }[]>(() => [
+  const menuGroups = useMemo(() => [
     {
       title: 'UTAMA',
       items: [
-        ['overview', t('dashboard') || 'Overview', 'home'],
-        ['professional-suite', 'Professional Suite', 'kpi']
+        ['overview', t('dashboard') || 'Overview', 'home'] as [MenuKey, string, string],
+        ['professional-suite', 'Professional Suite', 'kpi'] as [MenuKey, string, string]
       ]
     },
     {
       title: 'PEOPLE',
       items: [
-        ['employees', t('employees') || 'Semua Karyawan', 'users'],
-        ['id-card', 'ID Card', 'card'],
-        ['employee-360', 'Employee 360°', 'users'],
-        ['employee-add', t('add_employee') || 'Tambah Karyawan', 'plus'],
-        ['organization', 'Organisasi', 'org'],
-        ['hr-operations', 'HR Operations', 'settings']
+        ['employees', t('employees') || 'Semua Karyawan', 'users'] as [MenuKey, string, string],
+        ['id-card', 'ID Card', 'card'] as [MenuKey, string, string],
+        ['employee-360', 'Employee 360°', 'users'] as [MenuKey, string, string],
+        ['employee-add', t('add_employee') || 'Tambah Karyawan', 'plus'] as [MenuKey, string, string],
+        ['organization', 'Organisasi', 'org'] as [MenuKey, string, string],
+        ['hr-operations', 'HR Operations', 'settings'] as [MenuKey, string, string]
       ]
     },
     {
       title: 'ATTENDANCE',
       items: [
-        ['attendance', 'Rekap Absensi', 'clock'],
-        ['attendance-today', 'Absensi Hari Ini', 'check'],
-        ['late', 'Keterlambatan', 'alert'],
-        ['leave', 'Izin & Sakit', 'leave'],
-        ['overtime', 'Lembur', 'arrow'],
-        ['selfie', 'Monitoring Selfie', 'camera']
+        ['attendance', 'Rekap Absensi', 'clock'] as [MenuKey, string, string],
+        ['attendance-today', 'Absensi Hari Ini', 'check'] as [MenuKey, string, string],
+        ['late', 'Keterlambatan', 'alert'] as [MenuKey, string, string],
+        ['leave', 'Izin & Sakit', 'leave'] as [MenuKey, string, string],
+        ['overtime', 'Lembur', 'arrow'] as [MenuKey, string, string],
+        ['selfie', 'Monitoring Selfie', 'camera'] as [MenuKey, string, string]
       ]
     },
     {
       title: 'PAYROLL',
       items: [
-        ['payroll', 'Monthly Payroll', 'payroll'],
-        ['production-hr', 'HR Transaction Center', 'settings'],
-        ['payroll-engine', t('payroll_calc') || 'Payroll Calculation', 'payroll'],
-        ['payroll-production-v22', t('payroll_control') || 'Payroll Control', 'payroll'],
-        ['payroll-components', 'Salary Components', 'components'],
-        ['payroll-overtime', 'Overtime Payroll', 'arrow'],
-        ['payslip', 'Payslip', 'calendar']
+        ['payroll', 'Monthly Payroll', 'payroll'] as [MenuKey, string, string],
+        ['production-hr', 'HR Transaction Center', 'settings'] as [MenuKey, string, string],
+        ['payroll-engine', t('payroll_calc') || 'Payroll Calculation', 'payroll'] as [MenuKey, string, string],
+        ['payroll-production-v22', t('payroll_control') || 'Payroll Control', 'payroll'] as [MenuKey, string, string],
+        ['payroll-components', 'Salary Components', 'components'] as [MenuKey, string, string],
+        ['payroll-overtime', 'Overtime Payroll', 'arrow'] as [MenuKey, string, string],
+        ['payslip', 'Payslip', 'calendar'] as [MenuKey, string, string]
       ]
     },
     {
       title: 'TALENT',
       items: [
-        ['performance', 'Performance', 'arrow'],
-        ['kpi', 'KPI & Target', 'kpi'],
-        ['recruitment-v25', 'Recruitment ATS Enterprise', 'recruitment'],
-        ['recruitment', 'Recruitment Legacy', 'recruitment'],
-        ['candidates', 'Kandidat', 'users']
+        ['performance', 'Performance', 'arrow'] as [MenuKey, string, string],
+        ['kpi', 'KPI & Target', 'kpi'] as [MenuKey, string, string],
+        ['recruitment-v25', 'Recruitment ATS Enterprise', 'recruitment'] as [MenuKey, string, string],
+        ['recruitment', 'Recruitment Legacy', 'recruitment'] as [MenuKey, string, string],
+        ['candidates', 'Kandidat', 'users'] as [MenuKey, string, string]
       ]
     },
     {
       title: 'ENTERPRISE SUITE',
       items: [
-        ['enterprise-v26', 'Documents & Compliance', 'request'],
-        ['enterprise-v27', 'Performance & KPI', 'kpi'],
-        ['enterprise-v28', 'HR Analytics & BI', 'kpi'],
-        ['enterprise-v29', 'HR Inbox', 'bell'],
-        ['enterprise-v30', 'ESS Enterprise', 'users'],
-        ['enterprise-v31', 'QA & Testing', 'check'],
-        ['enterprise-v32', 'Production Optimization', 'settings'],
-        ['enterprise-v33', 'Multi-Company', 'org'],
-        ['enterprise-v34', 'API & Integrations', 'settings'],
-        ['enterprise-v35', 'AI HR & Automation', 'kpi']
+        ['enterprise-v26', 'Documents & Compliance', 'request'] as [MenuKey, string, string],
+        ['enterprise-v27', 'Performance & KPI', 'kpi'] as [MenuKey, string, string],
+        ['enterprise-v28', 'HR Analytics & BI', 'kpi'] as [MenuKey, string, string],
+        ['enterprise-v29', 'HR Inbox', 'bell'] as [MenuKey, string, string],
+        ['enterprise-v30', 'ESS Enterprise', 'users'] as [MenuKey, string, string],
+        ['enterprise-v31', 'QA & Testing', 'check'] as [MenuKey, string, string],
+        ['enterprise-v32', 'Production Optimization', 'settings'] as [MenuKey, string, string],
+        ['enterprise-v33', 'Multi-Company', 'org'] as [MenuKey, string, string],
+        ['enterprise-v34', 'API & Integrations', 'settings'] as [MenuKey, string, string],
+        ['enterprise-v35', 'AI HR & Automation', 'kpi'] as [MenuKey, string, string]
       ]
     },
     {
       title: 'REPORTING',
       items: [
-        ['reports', 'Laporan', 'report']
+        ['reports', 'Laporan', 'report'] as [MenuKey, string, string]
       ]
     },
     {
       title: 'SYSTEM',
       items: [
-        ['enterprise-v20', 'Enterprise Command Center', 'org'],
-        ['payroll-indonesia-v23', 'Payroll Indonesia Compliance', 'payroll'],
-        ['security-v21', 'Security Center', 'health'],
-        ['approvals', 'Pusat Persetujuan', 'check'],
-        ['notifications', 'Notifikasi', 'bell'],
-        ['system-health', 'System Health', 'health'],
-        ['settings', t('settings') || 'Pengaturan', 'settings'],
-        ['roles', 'Role & Permission', 'users'],
-        ['audit', 'Audit Log', 'request']
+        ['enterprise-v20', 'Enterprise Command Center', 'org'] as [MenuKey, string, string],
+        ['payroll-indonesia-v23', 'Payroll Indonesia Compliance', 'payroll'] as [MenuKey, string, string],
+        ['security-v21', 'Security Center', 'health'] as [MenuKey, string, string],
+        ['approvals', 'Pusat Persetujuan', 'check'] as [MenuKey, string, string],
+        ['notifications', 'Notifikasi', 'bell'] as [MenuKey, string, string],
+        ['system-health', 'System Health', 'health'] as [MenuKey, string, string],
+        ['settings', t('settings') || 'Pengaturan', 'settings'] as [MenuKey, string, string],
+        ['roles', 'Role & Permission', 'users'] as [MenuKey, string, string],
+        ['audit', 'Audit Log', 'request'] as [MenuKey, string, string]
       ]
     }
   ], [t]);
 
-  // 3. Deklarasi visibleMenuGroups yang menggunakan state di atas
   const visibleMenuGroups = useMemo(() =>
     menuGroups
       .map((group) => ({
@@ -253,6 +252,9 @@ export default function DashboardAdmin() {
           menuPermissionForRole(item[0], userRole, dbPerms)
         ),
       }))
+      .filter((group) => group.items.length > 0),
+    [menuGroups, userRole, dbPerms]
+  );    }))
       .filter((group) => group.items.length > 0),
     [menuGroups, userRole, dbPerms]
   );
