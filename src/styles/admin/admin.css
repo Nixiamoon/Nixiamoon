@@ -1369,3 +1369,109 @@ table td {
   --mx-border: #e2e7ee;
   --mx-border-strong: #cbd2dc;
 }
+/* =========================================================
+   FINAL SIDEBAR VISIBILITY FIX
+   ========================================================= */
+
+aside.sidebar,
+.sidebar {
+  background: #ffffff !important;
+  color: #172033 !important;
+  opacity: 1 !important;
+}
+
+/* Brand */
+.sidebar .brand b {
+  color: #172033 !important;
+}
+
+.sidebar .brand small {
+  color: #667085 !important;
+}
+
+/* Judul group */
+.sidebar .nav-title,
+.sidebar .group-title {
+  color: #475467 !important;
+  opacity: 1 !important;
+  font-weight: 800 !important;
+}
+
+/* Menu */
+.sidebar .nav-item {
+  background: transparent !important;
+  color: #344054 !important;
+  opacity: 1 !important;
+  border: 1px solid transparent !important;
+}
+
+/* Text menu */
+.sidebar .nav-item span {
+  color: #344054 !important;
+  opacity: 1 !important;
+}
+
+/* Icon */
+.sidebar .nav-item svg {
+  color: #344054 !important;
+  stroke: #344054 !important;
+  opacity: 1 !important;
+}
+
+/* Hover */
+.sidebar .nav-item:hover {
+  background: #f2f4f7 !important;
+  color: #101828 !important;
+}
+
+/* Active */
+.sidebar .nav-item.active {
+  background: #fff4d6 !important;
+  color: #7a5b12 !important;
+  border-left: 3px solid #d6ae58 !important;
+}
+
+/* Active text */
+.sidebar .nav-item.active span {
+  color: #7a5b12 !important;
+  font-weight: 700 !important;
+}
+
+/* Workspace */
+.sidebar .workspace {
+  color: #667085 !important;
+  background: #ffffff !important;
+}
+
+.sidebar .workspace b {
+  color: #172033 !important;
+}
+
+.sidebar .workspace small {
+  color: #667085 !important;
+}
+
+/* Admin */
+.sidebar .admin-mini b {
+  color: #172033 !important;
+}
+
+.sidebar .admin-mini small {
+  color: #667085 !important;
+}
+
+/* Language */
+.sidebar .sidebar-bottom {
+  color: #344054 !important;
+}
+
+.sidebar .sidebar-bottom select {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border: 1px solid #98a2b3 !important;
+}
+
+/* Logout */
+.sidebar .logout {
+  color: #b42318 !important;
+}
