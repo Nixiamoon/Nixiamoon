@@ -20,6 +20,7 @@ import moonLogo from '../../../assets/moon-logo.svg';
 import IDCardModule from '../employee/IDCardModule';
 import '../../../styles/admin/id-card.css';
 import { useTranslation } from '../../../locales/LanguageContext';
+import SiDebarFloatingNavigator from '../../common/SiDebarFloatingNavigator';
 type Karyawan = {
   id: string;
   id_karyawan?: string;
