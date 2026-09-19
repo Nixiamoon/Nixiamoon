@@ -1,16 +1,6 @@
-import React from 'react';
-import SiDebarFloatingNavigator from '../../common/SiDebarFloatingNavigator';
 import './SiDebarFloatingNavigator.css';
 
-interface SiDebarFloatingNavigatorProps {
-  visible?: boolean;
-}
-
-export default function SiDebarFloatingNavigator({
-  visible = true,
-}: SiDebarFloatingNavigatorProps) {
-  if (!visible) return null;
-
+export default function SiDebarFloatingNavigator() {
   const scrollTop = () => {
     window.scrollTo({
       top: 0,
@@ -34,8 +24,8 @@ export default function SiDebarFloatingNavigator({
         type="button"
         className="si-debar-floating-btn"
         onClick={scrollTop}
-        aria-label="Ke atas"
         title="Ke atas"
+        aria-label="Ke atas"
       >
         ↑
       </button>
@@ -44,8 +34,8 @@ export default function SiDebarFloatingNavigator({
         type="button"
         className="si-debar-floating-btn"
         onClick={scrollBottom}
-        aria-label="Ke bawah"
         title="Ke bawah"
+        aria-label="Ke bawah"
       >
         ↓
       </button>
