@@ -421,8 +421,10 @@ export default function DashboardAdmin() {
         
         {/* Dropdown Pemilih Bahasa */}
         {sidebar && (
-  <div style={{ padding: '4px 12px 12px 12px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '8px' }}>
-    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px', fontWeight: 500, letterSpacing: '0.5px' }}>
+  <div style={{ padding: '4px 12px 12px 12px', borderBottom: '1px solid #e2e7ee' marginBottom: '8px' }}>
+    <div style={{
+  fontSize: '11px',
+  color: '#475467', marginBottom: '4px', fontWeight: 500, letterSpacing: '0.5px' }}>
       BAHASA / LANGUAGE
     </div>
     <select 
