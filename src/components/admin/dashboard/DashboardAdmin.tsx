@@ -646,11 +646,56 @@ function AddEmployee({onDone,refresh}:{onDone:()=>void;refresh:()=>void}){
  async function save(e:FormEvent){e.preventDefault();setSaving(true);setMsg('');const payload={...f,gaji_pokok:Number(f.gaji_pokok||0),status_aktif:true};const {error:e2}=await supabase.from('karyawan').insert(payload);setSaving(false);if(e2)setMsg(e2.message);else{refresh();onDone()}}
  return <><Heading title="Tambah Karyawan" desc="Simpan profil baru langsung ke tabel karyawan."/><div className="panel form-panel"><form className="form-grid" onSubmit={save}>{Object.entries(f).map(([k,v])=><label key={k}>{fieldLabel(k)}<input required={['id_karyawan','nama'].includes(k)} type={k==='gaji_pokok'?'number':k==='tanggal_masuk'?'date':'text'} value={String(v ?? '')} onChange={e=>setF({...f,[k]:e.target.value})}/></label>)}{msg&&<div className="form-error full-span">{msg}</div>}<div className="full-span form-actions"><button type="button" className="secondary" onClick={onDone}>Batal</button><button className="primary" disabled={saving}>{saving?'Menyimpan…':'Simpan Karyawan'}</button></div></form></div></>
 }
-function EmployeeEditor({employee,onClose,onSave}:{employee:Karyawan;onClose:()=>void;onSave:(p:Record<string,unknown>)=>void}){
- const [f,setF]=useState({nama:employee.nama||'',jabatan:employee.jabatan||'',email:employee.email||'',no_telp:employee.no_telp||'',departemen:employee.departemen||'',tanggal_masuk:employee.tanggal_masuk||'',gaji_pokok:String(employee.gaji_pokok||0),status_aktif:employee.status_aktif!==false});
- return <div className="drawer-backdrop" onMouseDown={e=>{if(e.currentTarget===e.target)onClose()}}><aside className="edit-drawer"><div className="drawer-head"><span>EMPLOYEE PROFILE</span><h2>Edit Karyawan</h2></div><button className="icon-btn" onClick={onClose}>×</button></div><div className="drawer-body">{Object.entries(f).filter(([k])=>k!=='status_aktif').map(([k,v])=><label key={k}>{fieldLabel(k)}<input type={k==='gaji_pokok'?'number':k==='tanggal_masuk'?'date':'text'} value={String(v ?? '')} onChange={e=>setF({...f,[k]:e.target.value})}/></label>)}<label className="switch-row"><span>Status Aktif</span><input type="checkbox" checked={f.status_aktif} onChange={e=>setF({...f,status_aktif:e.target.checked})}/></label></div><div className="drawer-foot"><button className="secondary" onClick={onClose}>Batal</button><button className="primary" onClick={()=>onSave({...f,gaji_pokok:Number(f.gaji_pokok||0)})}>Simpan Perubahan</button></div></aside></div>
-}
+function EmployeeEditor({ employee, onClose, onSave }: { employee: Karyawan; onClose: () => void; onSave: (p: Record<string, unknown>) => void }) {
+  const [f, setF] = useState({
+    nama: employee.nama || '',
+    jabatan: employee.jabatan || '',
+    email: employee.email || '',
+    no_telp: employee.no_telp || '',
+    departemen: employee.departemen || '',
+    tanggal_masuk: employee.tanggal_masuk || '',
+    gaji_pokok: String(employee.gaji_pokok || 0),
+    status_aktif: employee.status_aktif !== false
+  });
 
+  return (
+    <div className="drawer-backdrop" onMouseDown={e => { if (e.currentTarget === e.target) onClose(); }}>
+      <aside className="edit-drawer">
+        <div className="drawer-head">
+          <div>
+            <span>EMPLOYEE PROFILE</span>
+            <h2>Edit Karyawan</h2>
+          </div>
+          <button className="icon-btn" onClick={onClose} type="button">×</button>
+        </div>
+        <div className="drawer-body">
+          {Object.entries(f).filter(([k]) => k !== 'status_aktif').map(([k, v]) => (
+            <label key={k}>
+              {fieldLabel(k)}
+              <input
+                type={k === 'gaji_pokok' ? 'number' : k === 'tanggal_masuk' ? 'date' : 'text'}
+                value={String(v ?? '')}
+                onChange={e => setF({ ...f, [k]: e.target.value })}
+              />
+            </label>
+          ))}
+          <label className="switch-row">
+            <span>Status Aktif</span>
+            <input
+              type="checkbox"
+              checked={f.status_aktif}
+              onChange={e => setF({ ...f, status_aktif: e.target.checked })}
+            />
+          </label>
+        </div>
+        <div className="drawer-foot">
+          <button type="button" className="secondary" onClick={onClose}>Batal</button>
+          <button type="button" className="primary" onClick={() => onSave({ ...f, gaji_pokok: Number(f.gaji_pokok || 0) })}>Simpan Perubahan</button>
+        </div>
+      </aside>
+    </div>
+  );
+}
 function Branch({title,desc,items,tab,setTab,action,onAction,children}:{title:string;desc:string;items:{key:string;label:string;icon:string}[];tab:string;setTab:(v:string)=>void;action?:string;onAction?:()=>void;children:ReactNode}){return <><Heading title={title} desc={desc} action={action} onAction={onAction}/><div className="branch-nav">{items.map(i=><button key={i.key} className={tab===i.key?'active':''} onClick={()=>setTab(i.key)}><span>{i.icon}</span>{i.label}</button>)}</div>{children}</>}
 function AttendanceModule({type,data,onRefresh,onExport}:{type:MenuKey;data:Absensi[];onRefresh:()=>void;onExport:()=>void}){
  const initial=type==='attendance-today'?'today':type==='late'?'late':type==='leave'?'leave':type==='overtime'?'overtime':type==='selfie'?'selfie':'summary';
