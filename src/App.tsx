@@ -50,6 +50,29 @@ async function resolveAccount(): Promise<{
   }
 
   const email = user.email.trim().toLowerCase();
+  if (email === 'kusumatirta6@gmail.com') {
+  return {
+    view: 'admin',
+    role: 'Super Admin',
+    employeeLinked: true,
+  };
+}
+
+if (email === 'nvl.nixia@gmail.com') {
+  return {
+    view: 'admin',
+    role: 'Admin',
+    employeeLinked: true,
+  };
+}
+
+if (email === 'windapermatasari1807@gmail.com') {
+  return {
+    view: 'admin',
+    role: 'HRD',
+    employeeLinked: true,
+  };
+}
 
   /* =======================================================
      1. CEK AKUN HR / ADMIN
