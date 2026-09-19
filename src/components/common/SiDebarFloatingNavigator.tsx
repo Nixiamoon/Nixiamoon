@@ -1,4 +1,5 @@
 import React from 'react';
+import SiDebarFloatingNavigator from '../../common/SiDebarFloatingNavigator';
 import './SiDebarFloatingNavigator.css';
 
 interface SiDebarFloatingNavigatorProps {
