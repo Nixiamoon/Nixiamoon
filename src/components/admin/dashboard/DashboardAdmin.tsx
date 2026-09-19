@@ -1,5 +1,4 @@
 import PayrollIndonesiaV23 from '../payroll/PayrollIndonesiaV23';
-import SiDebarFloatingNavigator from '../../common/SiDebarFloatingNavigator';
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode, type CSSProperties } from 'react';
 import { isSupabaseConfigured, supabase } from '../../../lib/supabase/client';
 import { signIn, signOut } from '../../../lib/auth';
