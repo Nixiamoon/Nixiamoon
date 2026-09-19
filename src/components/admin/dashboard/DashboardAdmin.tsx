@@ -134,22 +134,128 @@ function Icon({ name }: { name: string }) {
   const d = paths[name] || paths.home; 
   return <svg className="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d}/></svg>;
 }
-
- export default function DashboardAdmin() {
+export default function DashboardAdmin() {
   const { lang, setLang, t } = useTranslation();
 
-  // 1. PINDAHKAN SEMUA STATE KE ATAS INI
-  const [logged, setLogged] = useState(false), [email, setEmail] = useState(''), [pin, setPin] = useState('');
-  const [menu, setMenu] = useState<MenuKey>('overview'), [sidebar, setSidebar] = useState(true);
-  const [employees, setEmployees] = useState<Karyawan[]>([]), [attendance, setAttendance] = useState<Absensi[]>([]);
-  const [search, setSearch] = useState(''), [loading, setLoading] = useState(false), [error, setError] = useState(''), [toast, setToast] = useState('');
-  const [editing, setEditing] = useState<Karyawan | null>(null), [userRole, setUserRole] = useState('');
+  // 1. Deklarasi State diletakkan paling atas di dalam komponen
+  const [logged, setLogged] = useState(false);
+  const [email, setEmail] = useState('');
+  const [pin, setPin] = useState('');
+  const [menu, setMenu] = useState<MenuKey>('overview');
+  const [sidebar, setSidebar] = useState(true);
+  const [employees, setEmployees] = useState<Karyawan[]>([]);
+  const [attendance, setAttendance] = useState<Absensi[]>([]);
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [toast, setToast] = useState('');
+  const [editing, setEditing] = useState<Karyawan | null>(null);
+  const [userRole, setUserRole] = useState('');
   const [dbPerms, setDbPerms] = useState<string[]>([]);
   const [sessionChecking, setSessionChecking] = useState(true);
 
-  // 2. BARU DEKLARASIKAN menuGroups DAN visibleMenuGroups DI BAWAH STATE
+  // 2. Deklarasi menuGroups
   const menuGroups = useMemo<{ title: string; items: [MenuKey, string, string][] }[]>(() => [
     {
+      title: 'UTAMA',
+      items: [
+        ['overview', t('dashboard') || 'Overview', 'home'],
+        ['professional-suite', 'Professional Suite', 'kpi']
+      ]
+    },
+    {
+      title: 'PEOPLE',
+      items: [
+        ['employees', t('employees') || 'Semua Karyawan', 'users'],
+        ['id-card', 'ID Card', 'card'],
+        ['employee-360', 'Employee 360°', 'users'],
+        ['employee-add', t('add_employee') || 'Tambah Karyawan', 'plus'],
+        ['organization', 'Organisasi', 'org'],
+        ['hr-operations', 'HR Operations', 'settings']
+      ]
+    },
+    {
+      title: 'ATTENDANCE',
+      items: [
+        ['attendance', 'Rekap Absensi', 'clock'],
+        ['attendance-today', 'Absensi Hari Ini', 'check'],
+        ['late', 'Keterlambatan', 'alert'],
+        ['leave', 'Izin & Sakit', 'leave'],
+        ['overtime', 'Lembur', 'arrow'],
+        ['selfie', 'Monitoring Selfie', 'camera']
+      ]
+    },
+    {
+      title: 'PAYROLL',
+      items: [
+        ['payroll', 'Monthly Payroll', 'payroll'],
+        ['production-hr', 'HR Transaction Center', 'settings'],
+        ['payroll-engine', t('payroll_calc') || 'Payroll Calculation', 'payroll'],
+        ['payroll-production-v22', t('payroll_control') || 'Payroll Control', 'payroll'],
+        ['payroll-components', 'Salary Components', 'components'],
+        ['payroll-overtime', 'Overtime Payroll', 'arrow'],
+        ['payslip', 'Payslip', 'calendar']
+      ]
+    },
+    {
+      title: 'TALENT',
+      items: [
+        ['performance', 'Performance', 'arrow'],
+        ['kpi', 'KPI & Target', 'kpi'],
+        ['recruitment-v25', 'Recruitment ATS Enterprise', 'recruitment'],
+        ['recruitment', 'Recruitment Legacy', 'recruitment'],
+        ['candidates', 'Kandidat', 'users']
+      ]
+    },
+    {
+      title: 'ENTERPRISE SUITE',
+      items: [
+        ['enterprise-v26', 'Documents & Compliance', 'request'],
+        ['enterprise-v27', 'Performance & KPI', 'kpi'],
+        ['enterprise-v28', 'HR Analytics & BI', 'kpi'],
+        ['enterprise-v29', 'HR Inbox', 'bell'],
+        ['enterprise-v30', 'ESS Enterprise', 'users'],
+        ['enterprise-v31', 'QA & Testing', 'check'],
+        ['enterprise-v32', 'Production Optimization', 'settings'],
+        ['enterprise-v33', 'Multi-Company', 'org'],
+        ['enterprise-v34', 'API & Integrations', 'settings'],
+        ['enterprise-v35', 'AI HR & Automation', 'kpi']
+      ]
+    },
+    {
+      title: 'REPORTING',
+      items: [
+        ['reports', 'Laporan', 'report']
+      ]
+    },
+    {
+      title: 'SYSTEM',
+      items: [
+        ['enterprise-v20', 'Enterprise Command Center', 'org'],
+        ['payroll-indonesia-v23', 'Payroll Indonesia Compliance', 'payroll'],
+        ['security-v21', 'Security Center', 'health'],
+        ['approvals', 'Pusat Persetujuan', 'check'],
+        ['notifications', 'Notifikasi', 'bell'],
+        ['system-health', 'System Health', 'health'],
+        ['settings', t('settings') || 'Pengaturan', 'settings'],
+        ['roles', 'Role & Permission', 'users'],
+        ['audit', 'Audit Log', 'request']
+      ]
+    }
+  ], [t]);
+
+  // 3. Deklarasi visibleMenuGroups yang menggunakan state di atas
+  const visibleMenuGroups = useMemo(() =>
+    menuGroups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) =>
+          menuPermissionForRole(item[0], userRole, dbPerms)
+        ),
+      }))
+      .filter((group) => group.items.length > 0),
+    [menuGroups, userRole, dbPerms]
+  );
       title: 'UTAMA',
       items: [
         ['overview', t('dashboard') || 'Overview', 'home'],
