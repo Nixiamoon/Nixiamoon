@@ -157,19 +157,21 @@ export default function DashboardAdmin() {
     },
     {
       title: 'SYSTEM',
-      items: [
-        ['enterprise-v20', 'Enterprise Command Center', 'org'],
-        ['payroll-indonesia-v23', 'Payroll Indonesia Compliance', 'payroll'],
-        ['security-v21', 'Security Center', 'health'],
-        ['approvals', 'Pusat Persetujuan', 'check'],
-        ['notifications', 'Notifikasi', 'bell'],
-        ['system-health', 'System Health', 'health'],
-        ['settings', t('settings') || 'Pengaturan', 'settings'],
-        ['roles', 'Role & Permission', 'users'],
-        ['audit', 'Audit Log', 'request']
-      ]
-    }
-  ], [t]);
+    const something = useMemo(() => [
+  {
+    items: [
+      ['enterprise-v20', 'Enterprise Command Center', 'org'],
+      ['payroll-indonesia-v23', 'Payroll Indonesia Compliance', 'payroll'],
+      ['security-v21', 'Security Center', 'health'],
+      ['approvals', 'Pusat Persetujuan', 'check'],
+      ['notifications', 'Notifikasi', 'bell'],
+      ['system-health', 'System Health', 'health'],
+      ['settings', t('settings') || 'Pengaturan', 'settings'],
+      ['roles', 'Role & Permission', 'users'],
+      ['audit', 'Audit Log', 'request'],
+    ],
+  },
+], [t]);
   const visibleMenuGroups = useMemo(() =>
     menuGroups
       .map((group) => ({
