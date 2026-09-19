@@ -20,6 +20,7 @@ import moonLogo from '../../../assets/moon-logo.svg';
 import IDCardModule from '../employee/IDCardModule';
 import '../../../styles/admin/id-card.css';
 import { useTranslation } from '../../../locales/LanguageContext';
+
 type Karyawan = {
   id: string;
   id_karyawan?: string;
@@ -56,6 +57,7 @@ interface Absensi {
   foto?: string;
   selfie_masuk?: string;
 }
+
 type MenuKey =
   | 'overview' | 'employees' | 'employee-360' | 'employee-add' | 'id-card' | 'organization' | 'hr-operations'
   | 'attendance' | 'attendance-today' | 'late' | 'leave' | 'overtime' | 'selfie'
@@ -68,20 +70,74 @@ type MenuKey =
 
 const isoToday = () => new Date().toISOString().slice(0, 10);
 
-const rolePermissions: Record<string,string[]> = {'Super Admin':['*'],'Admin':['people','attendance','schedule','leave','payroll','talent','reports','system'],'HRD':['people','attendance','schedule','leave','talent','reports'],'Payroll':['people.read','attendance.read','payroll','reports.payroll'],'Supervisor':['people.read','attendance.read','schedule.read','leave.read','leave.approve','reports.attendance'],'Karyawan':[]};
-const menuGroup=(key:MenuKey)=>['professional-suite'].includes(key)?'system':['employees','id-card','employee-360','employee-add','organization'].includes(key)?'people':['attendance','attendance-today','late','leave','overtime','selfie'].includes(key)?'attendance':['schedule','shift','holiday'].includes(key)?'schedule':['leave-request','leave-balance','approvals'].includes(key)?'leave':['payroll','payroll-components','payroll-overtime','payslip','production-hr','payroll-engine','payroll-production-v22'].includes(key)?'payroll':['performance','kpi'].includes(key)?'talent':['recruitment','candidates','recruitment-v25'].includes(key)?'recruitment':['enterprise-v26','enterprise-v27','enterprise-v28','enterprise-v29','enterprise-v30','enterprise-v31','enterprise-v32','enterprise-v33','enterprise-v34','enterprise-v35'].includes(key)?'system':key==='reports'?'reports':key==='settings'?'settings':key==='roles'?'roles':key==='audit'?'audit':key==='notifications'?'notifications':key==='system-health'?'system':(key==='enterprise-v26'||key==='payroll-indonesia-v23')||key==='security-v21'?'system':'overview';
-const requiredPermission=(key:MenuKey)=>{if(key==='professional-suite')return 'system.health';if(key==='hr-operations')return 'people.read';if(key==='production-hr'||key==='payroll-engine'||key==='payroll-production-v22')return 'payroll.read';const g=menuGroup(key); if(key==='employee-add')return 'people.write'; if(key==='roles')return 'roles.read'; if(key==='settings')return 'settings.write'; if(key==='audit')return 'audit.read'; if(key==='approvals')return 'approval.read'; if(key==='notifications')return 'notifications.read'; if(key==='system-health')return 'system.health';if((key==='enterprise-v26'||key==='payroll-indonesia-v23'))return 'system.health'; if(key==='security-v21')return 'security.read'; if(key.startsWith('enterprise-v')) return 'system.health'; if(key==='overtime')return 'overtime.read'; if(key==='reports')return 'reports.read'; if(g==='recruitment')return 'recruitment.read'; if(g==='talent')return 'talent.read'; return g==='overview'?'':`${g}.read`;};
-const menuPermissionForRole=(key:MenuKey,role:string,dbPerms:string[]=[])=>{if(role==='Super Admin'||requiredPermission(key)===''||dbPerms.includes('*'))return true;const req=requiredPermission(key);if(key==='approvals')return ['approval.read','leave.approve','overtime.approve','payroll.approve','recruitment.approve'].some(p=>hasPermission(dbPerms,p,role)||hasPermission(rolePermissions[role]||[],p,role));return hasPermission(dbPerms,req,role)||hasPermission(dbPerms,menuGroup(key),role)||hasPermission(rolePermissions[role]||[],req,role)||hasPermission(rolePermissions[role]||[],menuGroup(key),role);};
+const rolePermissions: Record<string, string[]> = {
+  'Super Admin': ['*'],
+  'Admin': ['people', 'attendance', 'schedule', 'leave', 'payroll', 'talent', 'reports', 'system'],
+  'HRD': ['people', 'attendance', 'schedule', 'leave', 'talent', 'reports'],
+  'Payroll': ['people.read', 'attendance.read', 'payroll', 'reports.payroll'],
+  'Supervisor': ['people.read', 'attendance.read', 'schedule.read', 'leave.read', 'leave.approve', 'reports.attendance'],
+  'Karyawan': []
+};
 
-function Icon({name}:{name:string}){
- const paths:Record<string,string>={chevronDown:'M6 9l6 6 6-6',chevronRight:'M9 6l6 6-6 6',logout:'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9',menu:'M4 6h16M4 12h16M4 18h16',refresh:'M20 11a8 8 0 1 0 1 4m-1-4v-5m0 5h-5',search:'M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16m10 2-4.3-4.3',home:'M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',users:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8m6-3a4 4 0 0 1 4 4m-1-8a3 3 0 0 1 0 6',plus:'M12 5v14M5 12h14',org:'M4 4h16v16H4zM8 8h3v3H8zm5 0h3v3h-3zM8 13h3v3H8zm5 0h3v3h-3z',clock:'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0',check:'m5 12 4 4L19 6',alert:'M12 9v4m0 4h.01M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0',leave:'M7 3h10v18H7zM10 12h7m0 0-3-3m3 3-3 3',arrow:'M5 12h14m-6-6 6 6-6 6',camera:'M4 7h3l2-2h6l2 2h3v12H4zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8',calendar:'M4 5h16v16H4zM8 3v4m8-4v4M4 10h16',shift:'M6 4h12v16H6zM9 8h6M9 12h6M9 16h4',holiday:'M12 2l2.6 6.3 6.8.5-5.2 4.4 1.6 6.6-5.8-3.5-5.8 3.5 1.6-6.6-5.2-4.4 6.8-.5z',request:'M6 3h12v18H6zM9 8h6M9 12h6M9 16h4',balance:'M5 4h14v16H5zM9 8h6M9 12h3',payroll:'M5 4h14v16H5zM8 8h8M8 12h8M8 16h5',components:'M5 5h14M5 12h14M5 19h14',kpi:'M5 20V10m7 10V4m7 16v-7',recruitment:'M4 6h16v12H4zM8 10h8M8 14h5',report:'M5 4h14v16H5zM8 9h8M8 13h8M8 17h5',settings:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8m0-6v3m0 14v3m10-10h-3M5 12H2m17.1-7.1-2.1 2.1M7 17l-2.1 2.1m12.2 0L15 17M7 7 4.9 4.9',bell:'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 13h6',health:'M20 12h-4l-2 7-4-14-2 7H4',card:'M5 4h14v16H5zM8 8h8M8 12h5M8 16h8',dashboard:'M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z'}
- const d=paths[name]||paths.home; return <svg className="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d}/></svg>
+const menuGroup = (key: MenuKey) => 
+  ['professional-suite'].includes(key) ? 'system' : 
+  ['employees', 'id-card', 'employee-360', 'employee-add', 'organization'].includes(key) ? 'people' : 
+  ['attendance', 'attendance-today', 'late', 'leave', 'overtime', 'selfie'].includes(key) ? 'attendance' : 
+  ['schedule', 'shift', 'holiday'].includes(key) ? 'schedule' : 
+  ['leave-request', 'leave-balance', 'approvals'].includes(key) ? 'leave' : 
+  ['payroll', 'payroll-components', 'payroll-overtime', 'payslip', 'production-hr', 'payroll-engine', 'payroll-production-v22'].includes(key) ? 'payroll' : 
+  ['performance', 'kpi'].includes(key) ? 'talent' : 
+  ['recruitment', 'candidates', 'recruitment-v25'].includes(key) ? 'recruitment' : 
+  ['enterprise-v26', 'enterprise-v27', 'enterprise-v28', 'enterprise-v29', 'enterprise-v30', 'enterprise-v31', 'enterprise-v32', 'enterprise-v33', 'enterprise-v34', 'enterprise-v35'].includes(key) ? 'system' : 
+  key === 'reports' ? 'reports' : 
+  key === 'settings' ? 'settings' : 
+  key === 'roles' ? 'roles' : 
+  key === 'audit' ? 'audit' : 
+  key === 'notifications' ? 'notifications' : 
+  key === 'system-health' ? 'system' : 
+  (key === 'enterprise-v26' || key === 'payroll-indonesia-v23' || key === 'security-v21') ? 'system' : 'overview';
+
+const requiredPermission = (key: MenuKey) => {
+  if (key === 'professional-suite') return 'system.health';
+  if (key === 'hr-operations') return 'people.read';
+  if (key === 'production-hr' || key === 'payroll-engine' || key === 'payroll-production-v22') return 'payroll.read';
+  
+  const g = menuGroup(key); 
+  if (key === 'employee-add') return 'people.write'; 
+  if (key === 'roles') return 'roles.read'; 
+  if (key === 'settings') return 'settings.write'; 
+  if (key === 'audit') return 'audit.read'; 
+  if (key === 'approvals') return 'approval.read'; 
+  if (key === 'notifications') return 'notifications.read'; 
+  if (key === 'system-health') return 'system.health';
+  if ((key === 'enterprise-v26' || key === 'payroll-indonesia-v23')) return 'system.health'; 
+  if (key === 'security-v21') return 'security.read'; 
+  if (key.startsWith('enterprise-v')) return 'system.health'; 
+  if (key === 'overtime') return 'overtime.read'; 
+  if (key === 'reports') return 'reports.read'; 
+  if (g === 'recruitment') return 'recruitment.read'; 
+  if (g === 'talent') return 'talent.read'; 
+  return g === 'overview' ? '' : `${g}.read`;
+};
+
+const menuPermissionForRole = (key: MenuKey, role: string, dbPerms: string[] = []) => {
+  if (role === 'Super Admin' || requiredPermission(key) === '' || dbPerms.includes('*')) return true;
+  const req = requiredPermission(key);
+  if (key === 'approvals') return ['approval.read', 'leave.approve', 'overtime.approve', 'payroll.approve', 'recruitment.approve'].some(p => hasPermission(dbPerms, p, role) || hasPermission(rolePermissions[role] || [], p, role));
+  return hasPermission(dbPerms, req, role) || hasPermission(dbPerms, menuGroup(key), role) || hasPermission(rolePermissions[role] || [], req, role) || hasPermission(rolePermissions[role] || [], menuGroup(key), role);
+};
+
+function Icon({ name }: { name: string }) {
+  const paths: Record<string, string> = {
+    chevronDown: 'M6 9l6 6 6-6', chevronRight: 'M9 6l6 6-6 6', logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9', menu: 'M4 6h16M4 12h16M4 18h16', refresh: 'M20 11a8 8 0 1 0 1 4m-1-4v-5m0 5h-5', search: 'M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16m10 2-4.3-4.3', home: 'M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z', users: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8m6-3a4 4 0 0 1 4 4m-1-8a3 3 0 0 1 0 6', plus: 'M12 5v14M5 12h14', org: 'M4 4h16v16H4zM8 8h3v3H8zm5 0h3v3h-3zM8 13h3v3H8zm5 0h3v3h-3z', clock: 'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0', check: 'm5 12 4 4L19 6', alert: 'M12 9v4m0 4h.01M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0', leave: 'M7 3h10v18H7zM10 12h7m0 0-3-3m3 3-3 3', arrow: 'M5 12h14m-6-6 6 6-6 6', camera: 'M4 7h3l2-2h6l2 2h3v12H4zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8', calendar: 'M4 5h16v16H4zM8 3v4m8-4v4M4 10h16', shift: 'M6 4h12v16H6zM9 8h6M9 12h6M9 16h4', holiday: 'M12 2l2.6 6.3 6.8.5-5.2 4.4 1.6 6.6-5.8-3.5-5.8 3.5 1.6-6.6-5.2-4.4 6.8-.5z', request: 'M6 3h12v18H6zM9 8h6M9 12h6M9 16h4', balance: 'M5 4h14v16H5zM9 8h6M9 12h3', payroll: 'M5 4h14v16H5zM8 8h8M8 12h8M8 16h5', components: 'M5 5h14M5 12h14M5 19h14', kpi: 'M5 20V10m7 10V4m7 16v-7', recruitment: 'M4 6h16v12H4zM8 10h8M8 14h5', report: 'M5 4h14v16H5zM8 9h8M8 13h8M8 17h5', settings: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8m0-6v3m0 14v3m10-10h-3M5 12H2m17.1-7.1-2.1 2.1M7 17l-2.1 2.1m12.2 0L15 17M7 7 4.9 4.9', bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 13h6', health: 'M20 12h-4l-2 7-4-14-2 7H4', card: 'M5 4h14v16H5zM8 8h8M8 12h5M8 16h8', dashboard: 'M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z'
+  };
+  const d = paths[name] || paths.home; 
+  return <svg className="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d}/></svg>;
 }
 
 export default function DashboardAdmin() {
   const { lang, setLang, t } = useTranslation();
 
-  // 1. DEFINISIKAN menuGroups TERLEBIH DAHULU di atas
   const menuGroups = useMemo<{ title: string; items: [MenuKey, string, string][] }[]>(() => [
     {
       title: 'UTAMA',
@@ -94,7 +150,7 @@ export default function DashboardAdmin() {
       title: 'PEOPLE',
       items: [
         ['employees', t('employees') || 'Semua Karyawan', 'users'],
-        ['id-card', 'ID Card', 'card'], // Tetap statis sesuai aturan ID Card
+        ['id-card', 'ID Card', 'card'],
         ['employee-360', 'Employee 360°', 'users'],
         ['employee-add', t('add_employee') || 'Tambah Karyawan', 'plus'],
         ['organization', 'Organisasi', 'org'],
@@ -157,21 +213,20 @@ export default function DashboardAdmin() {
     },
     {
       title: 'SYSTEM',
-    const something = useMemo(() => [
-  {
-    items: [
-      ['enterprise-v20', 'Enterprise Command Center', 'org'],
-      ['payroll-indonesia-v23', 'Payroll Indonesia Compliance', 'payroll'],
-      ['security-v21', 'Security Center', 'health'],
-      ['approvals', 'Pusat Persetujuan', 'check'],
-      ['notifications', 'Notifikasi', 'bell'],
-      ['system-health', 'System Health', 'health'],
-      ['settings', t('settings') || 'Pengaturan', 'settings'],
-      ['roles', 'Role & Permission', 'users'],
-      ['audit', 'Audit Log', 'request'],
-    ],
-  },
-], [t]);
+      items: [
+        ['enterprise-v20', 'Enterprise Command Center', 'org'],
+        ['payroll-indonesia-v23', 'Payroll Indonesia Compliance', 'payroll'],
+        ['security-v21', 'Security Center', 'health'],
+        ['approvals', 'Pusat Persetujuan', 'check'],
+        ['notifications', 'Notifikasi', 'bell'],
+        ['system-health', 'System Health', 'health'],
+        ['settings', t('settings') || 'Pengaturan', 'settings'],
+        ['roles', 'Role & Permission', 'users'],
+        ['audit', 'Audit Log', 'request']
+      ]
+    }
+  ], [t]);
+
   const visibleMenuGroups = useMemo(() =>
     menuGroups
       .map((group) => ({
@@ -183,219 +238,169 @@ export default function DashboardAdmin() {
       .filter((group) => group.items.length > 0),
     [menuGroups, userRole, dbPerms]
   );
- const [logged,setLogged]=useState(false),[email,setEmail]=useState(''),[pin,setPin]=useState('');
- const [menu,setMenu]=useState<MenuKey>('overview'),[sidebar,setSidebar]=useState(true);
- const [employees,setEmployees]=useState<Karyawan[]>([]),[attendance,setAttendance]=useState<Absensi[]>([]);
- const [search,setSearch]=useState(''),[loading,setLoading]=useState(false),[error,setError]=useState(''),[toast,setToast]=useState('');
- const [editing,setEditing]=useState<Karyawan|null>(null),[userRole,setUserRole]=useState('');
- const [dbPerms,setDbPerms]=useState<string[]>([]);
- const [sessionChecking,setSessionChecking]=useState(true);
 
- useEffect(()=>{
-  let active=true;
-  const loadSession=async()=>{
-   setSessionChecking(true);
-   if(!isSupabaseConfigured){setError('Supabase belum dikonfigurasi. Isi VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY pada environment deployment.');setSessionChecking(false);return;}
-   const {data}=await supabase.auth.getUser();
-   if(!active)return;
-   if(data.user?.email){
-    const {data:p}=await supabase.from('hris_users').select('role,status').eq('email',data.user.email).maybeSingle();
-    if(active&&p?.status==='Aktif'){
-     setUserRole(p.role||'');
-     const {data:rp}=await supabase.from('hris_role_permissions').select('permission_code').eq('role_name',p.role);
-     if(active){setDbPerms((rp||[]).map(x=>x.permission_code));setEmail(data.user.email);setLogged(true);}
-    } else if(active) { await supabase.auth.signOut(); setLogged(false); }
-   }
-   if(active)setSessionChecking(false);
-  };
-  loadSession();
-  if(!isSupabaseConfigured)return()=>{active=false};
-  const {data:listener}=supabase.auth.onAuthStateChange((event,session)=>{
-   if(event==='SIGNED_OUT' || !session){setLogged(false);setUserRole('');setDbPerms([]);setSessionChecking(false);}
-  });
-  return()=>{active=false;listener.subscription.unsubscribe()};
- },[]);
- useEffect(()=>{if(logged)refresh()},[logged]);
- useEffect(()=>{const read=()=>{const candidate=location.hash.replace('#/','') as MenuKey;if(candidate&&menuGroups.flatMap(g=>g.items).some(x=>x[0]===candidate)&&menuPermissionForRole(candidate,userRole,dbPerms))setMenu(candidate)};read();window.addEventListener('hashchange',read);return()=>window.removeEventListener('hashchange',read)},[userRole,dbPerms,menuGroups]);
- const navigate=(next:MenuKey)=>{setMenu(next);location.hash=`/${next}`;if(window.innerWidth<900)setSidebar(false)};
-  async function confirmEmployeeEmail(
-  employee: Karyawan,
-) {
-  if (!employee.email) {
-    setError(
-      'Karyawan belum memiliki email.',
-    );
-    return;
-  }
+  const [logged, setLogged] = useState(false), [email, setEmail] = useState(''), [pin, setPin] = useState('');
+  const [menu, setMenu] = useState<MenuKey>('overview'), [sidebar, setSidebar] = useState(true);
+  const [employees, setEmployees] = useState<Karyawan[]>([]), [attendance, setAttendance] = useState<Absensi[]>([]);
+  const [search, setSearch] = useState(''), [loading, setLoading] = useState(false), [error, setError] = useState(''), [toast, setToast] = useState('');
+  const [editing, setEditing] = useState<Karyawan | null>(null), [userRole, setUserRole] = useState('');
+  const [dbPerms, setDbPerms] = useState<string[]>([]);
+  const [sessionChecking, setSessionChecking] = useState(true);
 
-  const confirmed = window.confirm(
-    `Aktifkan akun karyawan?\n\n` +
+  useEffect(() => {
+    let active = true;
+    const loadSession = async () => {
+      setSessionChecking(true);
+      if (!isSupabaseConfigured) { setError('Supabase belum dikonfigurasi. Isi VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY pada environment deployment.'); setSessionChecking(false); return; }
+      const { data } = await supabase.auth.getUser();
+      if (!active) return;
+      if (data.user?.email) {
+        const { data: p } = await supabase.from('hris_users').select('role,status').eq('email', data.user.email).maybeSingle();
+        if (active && p?.status === 'Aktif') {
+          setUserRole(p.role || '');
+          const { data: rp } = await supabase.from('hris_role_permissions').select('permission_code').eq('role_name', p.role);
+          if (active) { setDbPerms((rp || []).map(x => x.permission_code)); setEmail(data.user.email); setLogged(true); }
+        } else if (active) { await supabase.auth.signOut(); setLogged(false); }
+      }
+      if (active) setSessionChecking(false);
+    };
+    loadSession();
+    if (!isSupabaseConfigured) return () => { active = false };
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session) { setLogged(false); setUserRole(''); setDbPerms([]); setSessionChecking(false); }
+    });
+    return () => { active = false; listener.subscription.unsubscribe() };
+  }, []);
+
+  useEffect(() => { if (logged) refresh() }, [logged]);
+  useEffect(() => { const read = () => { const candidate = location.hash.replace('#/', '') as MenuKey; if (candidate && menuGroups.flatMap(g => g.items).some(x => x[0] === candidate) && menuPermissionForRole(candidate, userRole, dbPerms)) setMenu(candidate) }; read(); window.addEventListener('hashchange', read); return () => window.removeEventListener('hashchange', read) }, [userRole, dbPerms, menuGroups]);
+  
+  const navigate = (next: MenuKey) => { setMenu(next); location.hash = `/${next}`; if (window.innerWidth < 900) setSidebar(false) };
+
+  async function confirmEmployeeEmail(employee: Karyawan) {
+    if (!employee.email) {
+      setError('Karyawan belum memiliki email.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Aktifkan akun karyawan?\n\n` +
       `Nama: ${employee.nama}\n` +
       `ID: ${employee.id_karyawan || '-'}\n` +
       `Email: ${employee.email}\n\n` +
-      `Jika akun belum ada, sistem akan otomatis membuat akun Supabase Auth.`,
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  try {
-    setError('');
-    setLoading(true);
-
-    const {
-      data: sessionData,
-      error: sessionError,
-    } =
-      await supabase.auth.getSession();
-
-    if (sessionError) {
-      throw sessionError;
-    }
-
-    const accessToken =
-      sessionData.session?.access_token;
-
-    if (!accessToken) {
-      throw new Error(
-        'Sesi login HR/Admin tidak ditemukan. Silakan login ulang.',
-      );
-    }
-
-    const response = await fetch(
-      '/.netlify/functions/confirm-email',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type':
-            'application/json',
-          Authorization:
-            `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          employee_id: employee.id,
-        }),
-      },
+      `Jika akun belum ada, sistem akan otomatis membuat akun Supabase Auth.`
     );
 
-    let result: {
-      success?: boolean;
-      account_created?: boolean;
-      message?: string;
-      error?: string;
-      temporary_password?: string;
-      email?: string;
-      nama?: string;
-    } = {};
+    if (!confirmed) return;
 
     try {
-      result = await response.json();
-    } catch {
-      result = {};
-    }
+      setError('');
+      setLoading(true);
 
-    if (!response.ok) {
-      throw new Error(
-        result.error ||
-          result.message ||
-          'Gagal membuat akun karyawan.',
-      );
-    }
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
 
-    if (
-      result.success &&
-      result.account_created &&
-      result.temporary_password
-    ) {
-      window.alert(
-        `AKUN KARYAWAN BERHASIL DIBUAT\n\n` +
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) throw new Error('Sesi login HR/Admin tidak ditemukan. Silakan login ulang.');
+
+      const response = await fetch('/.netlify/functions/confirm-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ employee_id: employee.id }),
+      });
+
+      let result: { success?: boolean; account_created?: boolean; message?: string; error?: string; temporary_password?: string; email?: string; nama?: string } = {};
+      try { result = await response.json(); } catch { result = {}; }
+
+      if (!response.ok) throw new Error(result.error || result.message || 'Gagal membuat akun karyawan.');
+
+      if (result.success && result.account_created && result.temporary_password) {
+        window.alert(
+          `AKUN KARYAWAN BERHASIL DIBUAT\n\n` +
           `Nama: ${result.nama || employee.nama}\n` +
           `Email: ${result.email || employee.email}\n\n` +
           `PASSWORD SEMENTARA:\n` +
           `${result.temporary_password}\n\n` +
-          `Berikan email dan password ini kepada karyawan.`,
-      );
-    } else {
-      window.alert(
-        result.message ||
-          `Akun ${employee.nama} berhasil diaktifkan.`,
-      );
+          `Berikan email dan password ini kepada karyawan.`
+        );
+      } else {
+        window.alert(result.message || `Akun ${employee.nama} berhasil diaktifkan.`);
+      }
+
+      setToast(result.message || 'Akun karyawan berhasil diaktifkan.');
+      await refresh();
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Gagal membuat akun karyawan.';
+      setError(message);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    setToast(
-      result.message ||
-        'Akun karyawan berhasil diaktifkan.',
-    );
-
-    await refresh();
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : 'Gagal membuat akun karyawan.';
-
-    setError(message);
-  } finally {
+  async function refresh() {
+    setLoading(true); setError('');
+    const [k, a] = await Promise.all([
+      supabase.from('karyawan').select('*').order('nama'),
+      supabase.from('absensi').select('*').order('created_at', { ascending: false }).limit(2000)
+    ]);
+    if (k.error) setError(`Karyawan: ${k.error.message}`); else setEmployees(k.data || []);
+    if (a.error) setError(v => v ? `${v}\nAbsensi: ${a.error.message}` : `Absensi: ${a.error.message}`); else setAttendance(a.data || []);
     setLoading(false);
   }
-}
- async function refresh(){
-  setLoading(true); setError('');
-  const [k,a]=await Promise.all([
-   supabase.from('karyawan').select('*').order('nama'),
-   supabase.from('absensi').select('*').order('created_at',{ascending:false}).limit(2000)
-  ]);
-  if(k.error)setError(`Karyawan: ${k.error.message}`); else setEmployees(k.data||[]);
-  if(a.error)setError(v=>v?`${v}\nAbsensi: ${a.error.message}`:`Absensi: ${a.error.message}`); else setAttendance(a.data||[]);
-  setLoading(false);
- }
- async function login(e:FormEvent){
-  e.preventDefault(); setError('');
-  if(!isSupabaseConfigured){setError('Supabase belum dikonfigurasi. Isi VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY pada environment deployment.');return}
-  setLoading(true);
-  const {data,error:e2}=await signIn(email,pin);
-  setLoading(false);
-  if(e2 || !data.user){ setError(e2?.message || 'Email atau password tidak valid.'); return; }
-  const {data:profile,error:pe}=await supabase.from('hris_users').select('role,status').ilike('email',data.user.email||'').maybeSingle();
-  if(pe){ await signOut(); setError('Profil akses HR tidak dapat diverifikasi. Coba lagi atau hubungi administrator.'); return; }
-  if(!profile || profile.status!=='Aktif'){
-    await signOut(); setError('Akun tidak memiliki akses Dashboard HR.'); return;
+
+  async function login(e: FormEvent) {
+    e.preventDefault(); setError('');
+    if (!isSupabaseConfigured) { setError('Supabase belum dikonfigurasi. Isi VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY pada environment deployment.'); return }
+    setLoading(true);
+    const { data, error: e2 } = await signIn(email, pin);
+    setLoading(false);
+    if (e2 || !data.user) { setError(e2?.message || 'Email atau password tidak valid.'); return; }
+    const { data: profile, error: pe } = await supabase.from('hris_users').select('role,status').ilike('email', data.user.email || '').maybeSingle();
+    if (pe) { await signOut(); setError('Profil akses HR tidak dapat diverifikasi. Coba lagi atau hubungi administrator.'); return; }
+    if (!profile || profile.status !== 'Aktif') {
+      await signOut(); setError('Akun tidak memiliki akses Dashboard HR.'); return;
+    }
+    setUserRole(profile.role);
+    const { data: rp } = await supabase.from('hris_role_permissions').select('permission_code').eq('role_name', profile.role);
+    setDbPerms((rp || []).map(x => x.permission_code));
+    setLogged(true);
   }
-  setUserRole(profile.role);
-  const {data:rp}=await supabase.from('hris_role_permissions').select('permission_code').eq('role_name',profile.role);
-  setDbPerms((rp||[]).map(x=>x.permission_code));
-  setLogged(true);
- }
- async function removeEmployee(k:Karyawan){
-  if(!menuPermissionForRole('employees',userRole,dbPerms) || !canDelete(dbPerms,'people',userRole)){setError('Anda tidak memiliki permission people.delete.');return}
-  if(!confirm(`Hapus ${k.nama}?`))return;
-  const {error:e}=await supabase.from('karyawan').delete().eq('id',k.id);
-  if(e)setError(e.message);else{setToast('Karyawan dihapus.');refresh()}
- }
- async function saveEdit(payload:Record<string,unknown>){
-  if(!canWrite(dbPerms,'people',userRole)){setError('Anda tidak memiliki permission people.write.');return}
-  if(!editing)return;
-  const {error:e}=await supabase.from('karyawan').update(payload).eq('id',editing.id);
-  if(e)setError(e.message);else{setEditing(null);setToast('Data karyawan tersimpan.');refresh()}
- }
- const filtered=useMemo(()=>employees.filter(k=>`${k.nama} ${k.id_karyawan||''} ${k.jabatan||''} ${k.departemen||''}`.toLowerCase().includes(search.toLowerCase())),[employees,search]);
- const filteredA=useMemo(()=>attendance.filter(a=>`${a.nama||''} ${a.id_karyawan||''} ${a.status||''}`.toLowerCase().includes(search.toLowerCase())),[attendance,search]);
- const today=attendance.filter(a=>a.tanggal===isoToday());
- const present=today.filter(a=>['Hadir','Tepat Waktu','Terlambat'].includes(a.status||'')).length;
- const late=today.filter(a=>(a.status||'').toLowerCase().includes('terlambat')||Number(a.keterlambatan_menit)>0).length;
- const payroll=employees.reduce((s,k)=>s+Number(k.gaji_pokok||0),0);
- const activeLabel=menuGroups.flatMap(g=>g.items).find((x) => x[0] === menu)?.[1] || 'Overview';
- const exportCsv=(rows:Record<string,unknown>[],filename:string)=>{
-  if(!rows.length){setToast('Tidak ada data untuk diekspor.');return}
-  const keys=Object.keys(rows[0]);const esc=(v:unknown)=>`"${String(v??'').replace(/"/g,'""')}"`;
-  const csv=[keys.join(';'),...rows.map(r=>keys.map(k=>esc(r[k])).join(';'))].join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download=filename;a.click();URL.revokeObjectURL(a.href);
- };
- if(sessionChecking)return <div className="login-wrap"><div className="login-card"><div className="loading">Memeriksa sesi keamanan...</div></div></div>;
- if(!logged)return <Login email={email} pin={pin} setEmail={setEmail} setPin={setPin} onSubmit={login} loading={loading} error={error}/>;
- return (
-  <div className="talenta-shell">
+
+  async function removeEmployee(k: Karyawan) {
+    if (!menuPermissionForRole('employees', userRole, dbPerms) || !canDelete(dbPerms, 'people', userRole)) { setError('Anda tidak memiliki permission people.delete.'); return }
+    if (!confirm(`Hapus ${k.nama}?`)) return;
+    const { error: e } = await supabase.from('karyawan').delete().eq('id', k.id);
+    if (e) setError(e.message); else { setToast('Karyawan dihapus.'); refresh() }
+  }
+
+  async function saveEdit(payload: Record<string, unknown>) {
+    if (!canWrite(dbPerms, 'people', userRole)) { setError('Anda tidak memiliki permission people.write.'); return }
+    if (!editing) return;
+    const { error: e } = await supabase.from('karyawan').update(payload).eq('id', editing.id);
+    if (e) setError(e.message); else { setEditing(null); setToast('Data karyawan tersimpan.'); refresh() }
+  }
+
+  const filtered = useMemo(() => employees.filter(k => `${k.nama} ${k.id_karyawan || ''} ${k.jabatan || ''} ${k.departemen || ''}`.toLowerCase().includes(search.toLowerCase())), [employees, search]);
+  const filteredA = useMemo(() => attendance.filter(a => `${a.nama || ''} ${a.id_karyawan || ''} ${a.status || ''}`.toLowerCase().includes(search.toLowerCase())), [attendance, search]);
+  const today = attendance.filter(a => a.tanggal === isoToday());
+  const present = today.filter(a => ['Hadir', 'Tepat Waktu', 'Terlambat'].includes(a.status || '')).length;
+  const late = today.filter(a => (a.status || '').toLowerCase().includes('terlambat') || Number(a.keterlambatan_menit) > 0).length;
+  const payroll = employees.reduce((s, k) => s + Number(k.gaji_pokok || 0), 0);
+  const activeLabel = menuGroups.flatMap(g => g.items).find((x) => x[0] === menu)?.[1] || 'Overview';
+  
+  const exportCsv = (rows: Record<string, unknown>[], filename: string) => {
+    if (!rows.length) { setToast('Tidak ada data untuk diekspor.'); return }
+    const keys = Object.keys(rows[0]); const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const csv = [keys.join(';'), ...rows.map(r => keys.map(k => esc(r[k])).join(';'))].join('\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })); a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+  };
+  if (sessionChecking) return <div className="login-wrap"><div className="login-card"><div className="loading">Memeriksa sesi keamanan...</div></div></div>;
+  if (!logged) return <Login email={email} pin={pin} setEmail={setEmail} setPin={setPin} onSubmit={login} loading={loading} error={error}/>;
+  return (
+   <div className="talenta-shell">
 
     <aside className="sidebar">
       <div className="sidebar-head">
@@ -413,7 +418,7 @@ export default function DashboardAdmin() {
 
     if (!visibleItems.length) return null;
 return ( 
-              <div className="nav-group" key={group.title}>
+            <div className="nav-group" key={group.title}>
               {sidebar && <div className="nav-title">{group.title}</div>}
               {visibleItems.map(([key, label, icon]) => (
                 <button
@@ -432,7 +437,7 @@ return (
         })}
       </nav>
 
-   
+     
       
       {/* ===== BAGIAN BAWAH SIDEBAR (PROFIL, BAHASA, & LOGOUT) ===== */}
       <div className="sidebar-bottom">
@@ -499,8 +504,8 @@ return (
       </div>
       {/* ======================================================== */}
     </aside>
-  <main className="talenta-main"><header className="topbar"><button className="icon-btn" aria-label="Buka menu" onClick={()=>setSidebar(v=>!v)}><Icon name="menu"/></button><div className="crumb"><span>MoonXprojecT</span><b>/</b>{activeLabel}</div><div className="top-actions"><div className="search-global"><span><Icon name="search"/></span><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Cari data..."/></div><button className="icon-btn" aria-label="Muat ulang" onClick={()=>refresh()}><Icon name="refresh"/></button><div className="avatar">HR</div></div></header>
-   <section className="page">{loading&&<div className="loading">Memuat data…</div>}{error&&<div className="alert">{error}</div>}
+   <main className="talenta-main"><header className="topbar"><button className="icon-btn" aria-label="Buka menu" onClick={()=>setSidebar(v=>!v)}><Icon name="menu"/></button><div className="crumb"><span>MoonXprojecT</span><b>/</b>{activeLabel}</div><div className="top-actions"><div className="search-global"><span><Icon name="search"/></span><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Cari data..."/></div><button className="icon-btn" aria-label="Muat ulang" onClick={()=>refresh()}><Icon name="refresh"/></button><div className="avatar">HR</div></div></header>
+    <section className="page">{loading&&<div className="loading">Memuat data…</div>}{error&&<div className="alert">{error}</div>}
     {menu==='overview'&&<Overview employees={employees} attendance={attendance} present={present} late={late} payroll={payroll} onNavigate={navigate}/>}
     {menu==='id-card'&&<IDCardModule employees={employees} companyName="MoonXprojecT" logoUrl={moonLogo}/> }
     {menu==='employees'&&<Employees data={filtered} onDelete={removeEmployee} onEdit={setEditing} onExport={()=>exportCsv(employees as any,'database-karyawan.csv')} onAdd={()=>navigate('employee-add')} onConfirmEmail={confirmEmployeeEmail}/> }
@@ -520,13 +525,14 @@ return (
     {toast&&<button className="toast" onClick={()=>setToast('')}>{toast} ×</button>}
       </section>
     </main>
-  </div>
-);
+   </div>
+  );
 };
 
 function Login(p:{email:string;pin:string;setEmail:(v:string)=>void;setPin:(v:string)=>void;onSubmit:(e:FormEvent)=>void;error:string;loading:boolean}){
  return <div className="login-wrap"><div className="login-card"><div className="brand center"><div className="brand-mark"><img src={moonLogo} alt="MoonXprojecT" /></div><div><b>MoonXprojecT</b><small>People Platform</small></div></div><h1>Selamat datang kembali</h1><p>Masuk ke dashboard HR & payroll.</p><form onSubmit={p.onSubmit}><label>Email<input value={p.email} onChange={e=>p.setEmail(e.target.value)} required/></label><label>PIN / Password<input type="password" value={p.pin} onChange={e=>p.setPin(e.target.value)} required/></label>{p.error&&<div className="form-error">{p.error}</div>}<button className="primary full" disabled={p.loading}>{p.loading?'Memeriksa…':'Masuk ke Dashboard'}</button></form><small className="security-note">Gunakan email dan password Supabase Auth yang diberikan HR.</small></div></div>
 }
+
 function Heading({
   title,
   desc,
@@ -552,7 +558,9 @@ function Heading({
       )}
     </div>
   );
-}function Overview({employees,attendance,present,late,payroll,onNavigate}:{employees:Karyawan[];attendance:Absensi[];present:number;late:number;payroll:number;onNavigate:(m:MenuKey)=>void}){
+}
+
+function Overview({employees,attendance,present,late,payroll,onNavigate}:{employees:Karyawan[];attendance:Absensi[];present:number;late:number;payroll:number;onNavigate:(m:MenuKey)=>void}){
  const active=employees.filter(k=>k.status_aktif!==false).length;
  const inactive=Math.max(0,employees.length-active);
  const absent=Math.max(0,employees.length-present-late);
@@ -640,7 +648,7 @@ function AddEmployee({onDone,refresh}:{onDone:()=>void;refresh:()=>void}){
 }
 function EmployeeEditor({employee,onClose,onSave}:{employee:Karyawan;onClose:()=>void;onSave:(p:Record<string,unknown>)=>void}){
  const [f,setF]=useState({nama:employee.nama||'',jabatan:employee.jabatan||'',email:employee.email||'',no_telp:employee.no_telp||'',departemen:employee.departemen||'',tanggal_masuk:employee.tanggal_masuk||'',gaji_pokok:String(employee.gaji_pokok||0),status_aktif:employee.status_aktif!==false});
- return <div className="drawer-backdrop" onMouseDown={e=>{if(e.currentTarget===e.target)onClose()}}><aside className="edit-drawer"><div className="drawer-head"><div><span>EMPLOYEE PROFILE</span><h2>Edit Karyawan</h2></div><button className="icon-btn" onClick={onClose}>×</button></div><div className="drawer-body">{Object.entries(f).filter(([k])=>k!=='status_aktif').map(([k,v])=><label key={k}>{fieldLabel(k)}<input type={k==='gaji_pokok'?'number':k==='tanggal_masuk'?'date':'text'} value={String(v ?? '')} onChange={e=>setF({...f,[k]:e.target.value})}/></label>)}<label className="switch-row"><span>Status Aktif</span><input type="checkbox" checked={f.status_aktif} onChange={e=>setF({...f,status_aktif:e.target.checked})}/></label></div><div className="drawer-foot"><button className="secondary" onClick={onClose}>Batal</button><button className="primary" onClick={()=>onSave({...f,gaji_pokok:Number(f.gaji_pokok||0)})}>Simpan Perubahan</button></div></aside></div>
+ return <div className="drawer-backdrop" onMouseDown={e=>{if(e.currentTarget===e.target)onClose()}}><aside className="edit-drawer"><div className="drawer-head"><span>EMPLOYEE PROFILE</span><h2>Edit Karyawan</h2></div><button className="icon-btn" onClick={onClose}>×</button></div><div className="drawer-body">{Object.entries(f).filter(([k])=>k!=='status_aktif').map(([k,v])=><label key={k}>{fieldLabel(k)}<input type={k==='gaji_pokok'?'number':k==='tanggal_masuk'?'date':'text'} value={String(v ?? '')} onChange={e=>setF({...f,[k]:e.target.value})}/></label>)}<label className="switch-row"><span>Status Aktif</span><input type="checkbox" checked={f.status_aktif} onChange={e=>setF({...f,status_aktif:e.target.checked})}/></label></div><div className="drawer-foot"><button className="secondary" onClick={onClose}>Batal</button><button className="primary" onClick={()=>onSave({...f,gaji_pokok:Number(f.gaji_pokok||0)})}>Simpan Perubahan</button></div></aside></div>
 }
 
 function Branch({title,desc,items,tab,setTab,action,onAction,children}:{title:string;desc:string;items:{key:string;label:string;icon:string}[];tab:string;setTab:(v:string)=>void;action?:string;onAction?:()=>void;children:ReactNode}){return <><Heading title={title} desc={desc} action={action} onAction={onAction}/><div className="branch-nav">{items.map(i=><button key={i.key} className={tab===i.key?'active':''} onClick={()=>setTab(i.key)}><span>{i.icon}</span>{i.label}</button>)}</div>{children}</>}
