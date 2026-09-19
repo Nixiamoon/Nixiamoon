@@ -1,0 +1,115 @@
+/* =========================================================
+   SI DEBAR FLOATING NAVIGATOR
+   Posisi: garis pembatas Sidebar HRIS dan Modul
+   ========================================================= */
+
+.si-debar-floating-nav {
+  position: fixed;
+
+  /*
+   * Sidebar HRIS biasanya berada di kiri.
+   * Ubah nilai ini jika lebar sidebar project berbeda.
+   */
+  left: 256px;
+
+  /*
+   * Tepat di garis pembatas.
+   * transform membuat setengah tombol masuk ke sisi sidebar
+   * dan setengah lainnya masuk ke area modul.
+   */
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 4px 12px rgba(16, 24, 40, 0.12),
+    0 1px 3px rgba(16, 24, 40, 0.08);
+}
+
+/* Tombol atas dan bawah */
+
+.si-debar-floating-btn {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  background: #ffffff;
+
+  color: #344054;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+/* Garis pemisah antara ↑ dan ↓ */
+
+.si-debar-floating-btn + .si-debar-floating-btn {
+  border-top: 1px solid #eaecf0;
+}
+
+/* Hover */
+
+.si-debar-floating-btn:hover {
+  background: #f2f4f7;
+  color: #101828;
+}
+
+/* Active */
+
+.si-debar-floating-btn:active {
+  background: #e4e7ec;
+}
+
+/* Keyboard accessibility */
+
+.si-debar-floating-btn:focus-visible {
+  outline: 2px solid #d6ae58;
+  outline-offset: -2px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .si-debar-floating-nav {
+    left: 220px;
+  }
+}
+
+@media (max-width: 700px) {
+  .si-debar-floating-nav {
+    left: 0;
+  }
+
+  .si-debar-floating-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+}
