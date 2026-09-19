@@ -1370,3 +1370,113 @@ table td {
   --mx-border-strong: #cbd2dc;
 }
 
+/* =========================================================
+   MOONXPROJECT - SIDEBAR CONTRAST FIX
+   ========================================================= */
+
+.talenta-sidebar {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-right: 1px solid #e2e7ee !important;
+}
+
+/* Judul kelompok menu:
+   SYSTEM / PEOPLE / ATTENDANCE / PAYROLL / dll */
+.talenta-sidebar .nav-title,
+.talenta-sidebar .group-title {
+  color: #667085 !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
+  opacity: 1 !important;
+}
+
+/* Semua item menu */
+.talenta-sidebar .nav-item {
+  background: transparent !important;
+  color: #344054 !important;
+  opacity: 1 !important;
+  border: 1px solid transparent !important;
+}
+
+/* Teks menu */
+.talenta-sidebar .nav-item span {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+
+/* Icon */
+.talenta-sidebar .nav-item .ui-icon {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+
+/* Hover */
+.talenta-sidebar .nav-item:hover {
+  background: #f5f7fa !important;
+  color: #101828 !important;
+  border-color: #e2e7ee !important;
+}
+
+/* Menu aktif */
+.talenta-sidebar .nav-item.active {
+  background: #fff8e8 !important;
+  color: #8a681c !important;
+  border-color: #d6ae58 !important;
+  box-shadow: inset 3px 0 0 #d6ae58 !important;
+}
+
+/* Workspace */
+.talenta-sidebar .workspace {
+  background: #ffffff !important;
+  border-color: #e2e7ee !important;
+  color: #667085 !important;
+}
+
+.talenta-sidebar .workspace b {
+  color: #172033 !important;
+}
+
+.talenta-sidebar .workspace small {
+  color: #667085 !important;
+}
+
+/* Admin / Super Admin */
+.talenta-sidebar .admin-mini {
+  border-top-color: #e2e7ee !important;
+}
+
+.talenta-sidebar .admin-mini b {
+  color: #172033 !important;
+}
+
+.talenta-sidebar .admin-mini small {
+  color: #667085 !important;
+}
+
+/* Logout */
+.talenta-sidebar .logout {
+  color: #b42318 !important;
+}
+
+.talenta-sidebar .logout:hover {
+  background: #fff1f2 !important;
+  color: #912018 !important;
+}
+
+/* Language */
+.talenta-sidebar .sidebar-bottom {
+  color: #344054 !important;
+}
+
+.talenta-sidebar .sidebar-bottom select {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-color: #d8dee8 !important;
+}
+
+.talenta-sidebar .sidebar-bottom select option {
+  background: #ffffff !important;
+  color: #172033 !important;
+}
