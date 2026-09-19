@@ -135,9 +135,19 @@ function Icon({ name }: { name: string }) {
   return <svg className="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={d}/></svg>;
 }
 
-export default function DashboardAdmin() {
+ export default function DashboardAdmin() {
   const { lang, setLang, t } = useTranslation();
 
+  // 1. PINDAHKAN SEMUA STATE KE ATAS INI
+  const [logged, setLogged] = useState(false), [email, setEmail] = useState(''), [pin, setPin] = useState('');
+  const [menu, setMenu] = useState<MenuKey>('overview'), [sidebar, setSidebar] = useState(true);
+  const [employees, setEmployees] = useState<Karyawan[]>([]), [attendance, setAttendance] = useState<Absensi[]>([]);
+  const [search, setSearch] = useState(''), [loading, setLoading] = useState(false), [error, setError] = useState(''), [toast, setToast] = useState('');
+  const [editing, setEditing] = useState<Karyawan | null>(null), [userRole, setUserRole] = useState('');
+  const [dbPerms, setDbPerms] = useState<string[]>([]);
+  const [sessionChecking, setSessionChecking] = useState(true);
+
+  // 2. BARU DEKLARASIKAN menuGroups DAN visibleMenuGroups DI BAWAH STATE
   const menuGroups = useMemo<{ title: string; items: [MenuKey, string, string][] }[]>(() => [
     {
       title: 'UTAMA',
@@ -234,6 +244,13 @@ export default function DashboardAdmin() {
         items: group.items.filter((item) =>
           menuPermissionForRole(item[0], userRole, dbPerms)
         ),
+      }))
+      .filter((group) => group.items.length > 0),
+    [menuGroups, userRole, dbPerms]
+  );
+
+  // Seterusnya kode useEffect, fungsi-fungsi handler, dan return JSX...
+
       }))
       .filter((group) => group.items.length > 0),
     [menuGroups, userRole, dbPerms]
