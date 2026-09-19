@@ -212,7 +212,15 @@ export default function DashboardAdmin() {
     setError(
       'Karyawan belum memiliki email.',
     );
-    return;
+    const visibleMenuGroups = menuGroups
+  .map((group) => ({
+    ...group,
+    items: group.items.filter((item) =>
+      menuPermissionForRole(item[0], userRole, dbPerms)
+    ),
+  }))
+  .filter((group) => group.items.length > 0);
+    return;
   }
 
   const confirmed = window.confirm(
@@ -381,9 +389,11 @@ export default function DashboardAdmin() {
  };
  if(sessionChecking)return <div className="login-wrap"><div className="login-card"><div className="loading">Memeriksa sesi keamanan...</div></div></div>;
  if(!logged)return <Login email={email} pin={pin} setEmail={setEmail} setPin={setPin} onSubmit={login} loading={loading} error={error}/>;
- return <div className="talenta-shell">
-  <aside className="sidebar">
-      <div className="sidebar-head">
+ return (
+  <div className="talenta-shell">
+
+    <aside className="sidebar">
+      <div className="sidebar-head">
         <div className="brand">
           <div className="brand-mark"><img src={moonLogo} alt="MoonXprojecT" /></div>
           {sidebar && <div><b>MoonXprojecT</b><small>People Platform</small></div>}
@@ -391,13 +401,14 @@ export default function DashboardAdmin() {
       </div>
 
       <nav className="sidebar-nav" aria-label="Menu utama">
-        {menuGroups.map(group => {
-          const visibleItems = group.items.filter(item =>
-            menuPermissionForRole(item[0], userRole, dbPerms)
-          );
-          if (!visibleItems.length) return null;
-          return (
-            <div className="nav-group" key={group.title}>
+  {visibleMenuGroups.map((group) => {
+    const visibleItems = group.items.filter((item) =>
+      menuPermissionForRole(item[0], userRole, dbPerms)
+    );
+
+    if (!visibleItems.length) return null;
+return ( 
+              <div className="nav-group" key={group.title}>
               {sidebar && <div className="nav-title">{group.title}</div>}
               {visibleItems.map(([key, label, icon]) => (
                 <button
@@ -416,6 +427,8 @@ export default function DashboardAdmin() {
         })}
       </nav>
 
+   
+      
       {/* ===== BAGIAN BAWAH SIDEBAR (PROFIL, BAHASA, & LOGOUT) ===== */}
       <div className="sidebar-bottom">
         
